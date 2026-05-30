@@ -3,7 +3,7 @@
 
 # Quickstart
 
-run `vite`
+run `npm run dev`
 
 ## Template
 
