@@ -41,4 +41,6 @@
      Perspective magnifies the near (left) edge, so it grows taller and
      foreshortens inward — reading as an open door in 3D. */
   transform: perspective(660px) rotateY(68deg);
+  cursor: pointer;
+  z-index: 1;
 }

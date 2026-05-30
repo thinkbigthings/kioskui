@@ -25,6 +25,12 @@ function App() {
     return () => clearInterval(intervalId)
   }, [])
 
+  const closeDoor = (lockerNumber: number) => {
+    fetch(`http://localhost:8080/api/sim/locker/${lockerNumber}/door/close`, {
+      method: 'POST',
+    }).catch((err) => console.error('Failed to close door', err))
+  }
+
   return (
     <div className="kiosk">
       {lockers
@@ -37,7 +43,12 @@ function App() {
                 background: `rgb(${led.red}, ${led.green}, ${led.blue})`,
               }}
             />
-            <div className={`door ${door === 'OPEN' ? 'open' : ''}`} />
+            <div
+              className={`door ${door === 'OPEN' ? 'open' : ''}`}
+              onClick={
+                door === 'OPEN' ? () => closeDoor(lockerNumber) : undefined
+              }
+            />
           </div>
         ))}
     </div>
