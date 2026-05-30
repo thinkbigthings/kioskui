@@ -6,6 +6,8 @@ interface KioskState {
   lockers: LockerNumbered[]
 }
 
+const LOCKERS_TO_SHOW = 8
+
 function App() {
   const [lockers, setLockers] = useState<LockerNumbered[]>([])
 
@@ -16,20 +18,20 @@ function App() {
       .catch((err) => console.error('Failed to load kiosk state', err))
   }, [])
 
-  const led = lockers[0]?.locker.led
-
   return (
     <div className="kiosk">
-      <div className="locker">
-        <div
-          className="led"
-          style={
-            led
-              ? { background: `rgb(${led.red}, ${led.green}, ${led.blue})` }
-              : undefined
-          }
-        />
-      </div>
+      {lockers
+        .filter(({ lockerNumber }) => lockerNumber <= LOCKERS_TO_SHOW)
+        .map(({ lockerNumber, locker: { led } }) => (
+          <div className="locker" key={lockerNumber}>
+            <div
+              className="led"
+              style={{
+                background: `rgb(${led.red}, ${led.green}, ${led.blue})`,
+              }}
+            />
+          </div>
+        ))}
     </div>
   )
 }
