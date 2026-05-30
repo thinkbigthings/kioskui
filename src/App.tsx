@@ -29,7 +29,7 @@ function App() {
     <div className="kiosk">
       {lockers
         .filter(({ lockerNumber }) => lockerNumber <= LOCKERS_TO_SHOW)
-        .map(({ lockerNumber, locker: { led } }) => (
+        .map(({ lockerNumber, locker: { led, door } }) => (
           <div className="locker" key={lockerNumber}>
             <div
               className="led"
@@ -37,6 +37,7 @@ function App() {
                 background: `rgb(${led.red}, ${led.green}, ${led.blue})`,
               }}
             />
+            <div className={`door ${door === 'OPEN' ? 'open' : ''}`} />
           </div>
         ))}
     </div>

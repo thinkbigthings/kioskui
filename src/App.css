@@ -22,3 +22,23 @@
   height: 100%;
   background: lightblue;
 }
+
+.door {
+  position: absolute;
+  left: 20%;
+  top: 0;
+  width: 80%;
+  height: 100%;
+  background: #b0b0b0;
+  border: 1px solid #888;
+  box-sizing: border-box;
+  transform-origin: right center;
+  transition: transform 0.4s ease;
+}
+
+.door.open {
+  /* Hinge on the right edge; swing the left edge toward the viewer.
+     Perspective magnifies the near (left) edge, so it grows taller and
+     foreshortens inward — reading as an open door in 3D. */
+  transform: perspective(660px) rotateY(68deg);
+}
