@@ -7,15 +7,22 @@ interface KioskState {
 }
 
 const LOCKERS_TO_SHOW = 8
+const POLL_INTERVAL_MS = 1000
 
 function App() {
   const [lockers, setLockers] = useState<LockerNumbered[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/sim/kiosk')
-      .then((res) => res.json())
-      .then((data: KioskState) => setLockers(data.lockers))
-      .catch((err) => console.error('Failed to load kiosk state', err))
+    const fetchState = () => {
+      fetch('http://localhost:8080/api/sim/kiosk')
+        .then((res) => res.json())
+        .then((data: KioskState) => setLockers(data.lockers))
+        .catch((err) => console.error('Failed to load kiosk state', err))
+    }
+
+    fetchState()
+    const intervalId = setInterval(fetchState, POLL_INTERVAL_MS)
+    return () => clearInterval(intervalId)
   }, [])
 
   return (
