@@ -9,7 +9,7 @@ import {
   UserRound,
 } from 'lucide-react'
 import './App.css'
-import type { LockerNumbered, ScannerState } from './types'
+import type { LockerNumbered, ScannerState, User } from './types'
 
 interface KioskState {
   scannerState: ScannerState
@@ -24,6 +24,8 @@ function App() {
   const [scannerActive, setScannerActive] = useState(false)
   const [manualOpen, setManualOpen] = useState(false)
   const [manualText, setManualText] = useState('')
+  const [users, setUsers] = useState<User[]>([])
+  const [badgeOpen, setBadgeOpen] = useState(false)
 
   useEffect(() => {
     const fetchState = () => {
@@ -39,6 +41,13 @@ function App() {
     fetchState()
     const intervalId = setInterval(fetchState, POLL_INTERVAL_MS)
     return () => clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/sim/kiosk/cache/users')
+      .then((res) => res.json())
+      .then((data: User[]) => setUsers(data))
+      .catch((err) => console.error('Failed to load users', err))
   }, [])
 
   const closeDoor = (lockerNumber: number) => {
@@ -79,6 +88,16 @@ function App() {
     setManualOpen(false)
   }
 
+  const selectUser = (user: User) => {
+    enqueueScan(user.badgeNumber)
+    setBadgeOpen(false)
+  }
+
+  const userDisplayName = (user: User) => {
+    const fullName = `${user.firstName} ${user.lastName}`.trim()
+    return fullName || user.userName
+  }
+
   return (
     <div className="kiosk">
       <div className="scanner">
@@ -109,6 +128,7 @@ function App() {
             className="scanner-button"
             aria-label="badge"
             disabled={!scannerActive}
+            onClick={() => setBadgeOpen(true)}
           >
             <UserRound />
           </button>
@@ -181,6 +201,33 @@ function App() {
               </button>
               <button type="button" onClick={submitManual}>
                 OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {badgeOpen && (
+        <div className="modal-overlay" onClick={() => setBadgeOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <span className="modal-label">Select a user</span>
+            <ul className="user-list">
+              {[...users]
+                .sort((a, b) =>
+                  userDisplayName(a).localeCompare(userDisplayName(b)),
+                )
+                .map((user) => (
+                  <li
+                    key={user.badgeNumber}
+                    className="user-list-item"
+                    onClick={() => selectUser(user)}
+                  >
+                    {userDisplayName(user)}
+                  </li>
+                ))}
+            </ul>
+            <div className="modal-actions">
+              <button type="button" onClick={() => setBadgeOpen(false)}>
+                Cancel
               </button>
             </div>
           </div>

@@ -22,6 +22,13 @@ export interface ScannerState {
   active: boolean
 }
 
+export interface User {
+  badgeNumber: string
+  firstName: string
+  lastName: string
+  userName: string
+}
+
 export interface LockerNumbered {
   lockerNumber: number
   locker: Locker

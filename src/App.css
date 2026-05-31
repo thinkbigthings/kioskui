@@ -191,6 +191,31 @@
   color: var(--text-h);
 }
 
+.user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.user-list-item {
+  padding: 8px 12px;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.user-list-item:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.user-list-item:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
