@@ -11,7 +11,7 @@
   width: 220px;
   height: 80px;
   background: #888;
-  border: 1px solid #ccc;
+  border: 1px solid #666;
 }
 
 .led {
@@ -42,8 +42,8 @@
   top: 0;
   width: 80%;
   height: 100%;
-  background: #b0b0b0;
-  border: 1px solid #888;
+  background: linear-gradient(to bottom, #9a9a9a, #b8b8b8);
+  border: 1px solid #222;
   box-sizing: border-box;
   transform-origin: right center;
   transition: transform 0.4s ease;
