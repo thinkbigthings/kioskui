@@ -151,8 +151,51 @@ function App() {
     setRecentOpen(false)
   }
 
+  const renderLocker = ({ lockerNumber, locker }: LockerNumbered) => {
+    const { led, door, chargingPortStatus } = locker
+    return (
+      <div className="locker" key={lockerNumber}>
+        <div
+          className="led"
+          style={{
+            backgroundColor: `rgb(${led.red}, ${led.green}, ${led.blue})`,
+            color: `rgb(${led.red}, ${led.green}, ${led.blue})`,
+          }}
+        />
+        {door === 'OPEN' &&
+          (chargingPortStatus === 'PORT_STATUS_DETACHED' ? (
+            <Plug
+              className="port-icon plug"
+              size={64}
+              onClick={() => attachPort(lockerNumber)}
+            />
+          ) : (
+            <BatteryCharging
+              className="port-icon"
+              size={64}
+              onClick={() => detachPort(lockerNumber)}
+            />
+          ))}
+        <div
+          className={`door ${door === 'OPEN' ? 'open' : ''}`}
+          onClick={door === 'OPEN' ? () => closeDoor(lockerNumber) : undefined}
+        >
+          {chargingPortStatus !== 'PORT_STATUS_DETACHED' && door !== 'OPEN' && (
+            <Smartphone className="device-present" size={40} />
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  const visibleLockers = lockers
+    .filter(({ lockerNumber }) => lockerNumber <= LOCKERS_TO_SHOW)
+    .sort((a, b) => a.lockerNumber - b.lockerNumber)
+  const half = Math.ceil(visibleLockers.length / 2)
+
   return (
     <div className="kiosk">
+      {visibleLockers.slice(0, half).map(renderLocker)}
       <div className="scanner">
         <div className="scanner-top">
           <div className="scanner-label">Scanner</div>
@@ -197,44 +240,7 @@ function App() {
           </button>
         </div>
       </div>
-      {lockers
-        .filter(({ lockerNumber }) => lockerNumber <= LOCKERS_TO_SHOW)
-        .map(({ lockerNumber, locker: { led, door, chargingPortStatus } }) => (
-          <div className="locker" key={lockerNumber}>
-            <div
-              className="led"
-              style={{
-                backgroundColor: `rgb(${led.red}, ${led.green}, ${led.blue})`,
-                color: `rgb(${led.red}, ${led.green}, ${led.blue})`,
-              }}
-            />
-            {door === 'OPEN' &&
-              (chargingPortStatus === 'PORT_STATUS_DETACHED' ? (
-                <Plug
-                  className="port-icon plug"
-                  size={64}
-                  onClick={() => attachPort(lockerNumber)}
-                />
-              ) : (
-                <BatteryCharging
-                  className="port-icon"
-                  size={64}
-                  onClick={() => detachPort(lockerNumber)}
-                />
-              ))}
-            <div
-              className={`door ${door === 'OPEN' ? 'open' : ''}`}
-              onClick={
-                door === 'OPEN' ? () => closeDoor(lockerNumber) : undefined
-              }
-            >
-              {chargingPortStatus !== 'PORT_STATUS_DETACHED' &&
-                door !== 'OPEN' && (
-                  <Smartphone className="device-present" size={40} />
-                )}
-            </div>
-          </div>
-        ))}
+      {visibleLockers.slice(half).map(renderLocker)}
       {manualOpen && (
         <div className="modal-overlay" onClick={() => setManualOpen(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
