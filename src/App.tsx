@@ -22,6 +22,8 @@ const POLL_INTERVAL_MS = 1000
 function App() {
   const [lockers, setLockers] = useState<LockerNumbered[]>([])
   const [scannerActive, setScannerActive] = useState(false)
+  const [manualOpen, setManualOpen] = useState(false)
+  const [manualText, setManualText] = useState('')
 
   useEffect(() => {
     const fetchState = () => {
@@ -57,6 +59,26 @@ function App() {
     }).catch((err) => console.error('Failed to unplug', err))
   }
 
+  const enqueueScan = (data: string) => {
+    fetch('http://localhost:8080/api/sim/scanner/enqueue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ response: data }).toString(),
+    }).catch((err) => console.error('Failed to enqueue scan', err))
+  }
+
+  const openManual = () => {
+    setManualText('')
+    setManualOpen(true)
+  }
+
+  const submitManual = () => {
+    if (manualText) {
+      enqueueScan(manualText)
+    }
+    setManualOpen(false)
+  }
+
   return (
     <div className="kiosk">
       <div className="scanner">
@@ -78,6 +100,7 @@ function App() {
             className="scanner-button"
             aria-label="manual"
             disabled={!scannerActive}
+            onClick={openManual}
           >
             <SquarePen />
           </button>
@@ -137,6 +160,32 @@ function App() {
             </div>
           </div>
         ))}
+      {manualOpen && (
+        <div className="modal-overlay" onClick={() => setManualOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <label className="modal-label" htmlFor="manual-scan-input">
+              Enter text to scan
+            </label>
+            <input
+              id="manual-scan-input"
+              className="modal-input"
+              type="text"
+              autoFocus
+              value={manualText}
+              onChange={(e) => setManualText(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submitManual()}
+            />
+            <div className="modal-actions">
+              <button type="button" onClick={() => setManualOpen(false)}>
+                Cancel
+              </button>
+              <button type="button" onClick={submitManual}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

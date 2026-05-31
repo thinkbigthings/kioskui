@@ -154,3 +154,58 @@
   cursor: pointer;
   z-index: 1;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  padding: 20px;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.modal-label {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.modal-input {
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-actions button {
+  padding: 6px 14px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #d0d0d0;
+  color: #222;
+  cursor: pointer;
+}
+
+.modal-actions button:hover {
+  background: #e0e0e0;
+}
