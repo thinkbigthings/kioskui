@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
   BatteryCharging,
+  ChevronDown,
+  ChevronRight,
   History,
   Plug,
   RectangleHorizontal,
@@ -26,6 +28,7 @@ function App() {
   const [manualText, setManualText] = useState('')
   const [users, setUsers] = useState<User[]>([])
   const [badgeOpen, setBadgeOpen] = useState(false)
+  const [openRole, setOpenRole] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchState = () => {
@@ -97,6 +100,12 @@ function App() {
     const fullName = `${user.firstName} ${user.lastName}`.trim()
     return fullName || user.userName
   }
+
+  const usersByRole = users.reduce<Record<string, User[]>>((acc, user) => {
+    ;(acc[user.role] ??= []).push(user)
+    return acc
+  }, {})
+  const roles = Object.keys(usersByRole).sort()
 
   return (
     <div className="kiosk">
@@ -210,21 +219,46 @@ function App() {
         <div className="modal-overlay" onClick={() => setBadgeOpen(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <span className="modal-label">Select a user</span>
-            <ul className="user-list">
-              {[...users]
-                .sort((a, b) =>
-                  userDisplayName(a).localeCompare(userDisplayName(b)),
-                )
-                .map((user) => (
-                  <li
-                    key={user.badgeNumber}
-                    className="user-list-item"
-                    onClick={() => selectUser(user)}
+            <div className="accordion">
+              {roles.map((role) => (
+                <div className="accordion-section" key={role}>
+                  <button
+                    type="button"
+                    className="accordion-header"
+                    onClick={() =>
+                      setOpenRole((current) =>
+                        current === role ? null : role,
+                      )
+                    }
                   >
-                    {userDisplayName(user)}
-                  </li>
-                ))}
-            </ul>
+                    {openRole === role ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                    {role}
+                  </button>
+                  {openRole === role && (
+                    <ul className="user-list">
+                      {usersByRole[role]
+                        .slice()
+                        .sort((a, b) =>
+                          userDisplayName(a).localeCompare(userDisplayName(b)),
+                        )
+                        .map((user) => (
+                          <li
+                            key={user.badgeNumber}
+                            className="user-list-item"
+                            onClick={() => selectUser(user)}
+                          >
+                            {userDisplayName(user)}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
             <div className="modal-actions">
               <button type="button" onClick={() => setBadgeOpen(false)}>
                 Cancel

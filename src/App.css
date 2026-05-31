@@ -191,14 +191,41 @@
   color: var(--text-h);
 }
 
+.accordion {
+  width: 260px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.accordion-section:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: var(--social-bg);
+  color: var(--text-h);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accordion-header:hover {
+  background: var(--code-bg);
+}
+
 .user-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 280px;
+  /* only the expanded list scrolls, so the role headers stay visible */
+  max-height: 240px;
   overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 4px;
 }
 
 .user-list-item {
