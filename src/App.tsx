@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
   BatteryCharging,
-  ChevronDown,
-  ChevronRight,
   History,
   Plug,
   RectangleHorizontal,
@@ -11,6 +9,7 @@ import {
   UserRound,
 } from 'lucide-react'
 import './App.css'
+import AccordionPicker from './AccordionPicker'
 import type { Device, LockerNumbered, ScannerState, User } from './types'
 
 const UNKNOWN_DEVICE_TYPE = 'Unknown'
@@ -30,10 +29,8 @@ function App() {
   const [manualText, setManualText] = useState('')
   const [users, setUsers] = useState<User[]>([])
   const [badgeOpen, setBadgeOpen] = useState(false)
-  const [openRole, setOpenRole] = useState<string | null>(null)
   const [devices, setDevices] = useState<Device[]>([])
   const [deviceOpen, setDeviceOpen] = useState(false)
-  const [openDeviceType, setOpenDeviceType] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchState = () => {
@@ -117,22 +114,6 @@ function App() {
     enqueueScan(device.deviceNumber)
     setDeviceOpen(false)
   }
-
-  const usersByRole = users.reduce<Record<string, User[]>>((acc, user) => {
-    ;(acc[user.role] ??= []).push(user)
-    return acc
-  }, {})
-  const roles = Object.keys(usersByRole).sort()
-
-  const devicesByType = devices.reduce<Record<string, Device[]>>(
-    (acc, device) => {
-      const typeName = device.deviceType?.deviceTypeName ?? UNKNOWN_DEVICE_TYPE
-      ;(acc[typeName] ??= []).push(device)
-      return acc
-    },
-    {},
-  )
-  const deviceTypes = Object.keys(devicesByType).sort()
 
   return (
     <div className="kiosk">
@@ -244,108 +225,28 @@ function App() {
         </div>
       )}
       {badgeOpen && (
-        <div className="modal-overlay" onClick={() => setBadgeOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <span className="modal-label">Select a user</span>
-            <div className="accordion">
-              {roles.map((role) => (
-                <div className="accordion-section" key={role}>
-                  <button
-                    type="button"
-                    className="accordion-header"
-                    onClick={() =>
-                      setOpenRole((current) =>
-                        current === role ? null : role,
-                      )
-                    }
-                  >
-                    {openRole === role ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    )}
-                    {role}
-                  </button>
-                  {openRole === role && (
-                    <ul className="user-list">
-                      {usersByRole[role]
-                        .slice()
-                        .sort((a, b) =>
-                          userDisplayName(a).localeCompare(userDisplayName(b)),
-                        )
-                        .map((user) => (
-                          <li
-                            key={user.badgeNumber}
-                            className="user-list-item"
-                            onClick={() => selectUser(user)}
-                          >
-                            {userDisplayName(user)}
-                          </li>
-                        ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="modal-actions">
-              <button type="button" onClick={() => setBadgeOpen(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <AccordionPicker
+          title="Select a user"
+          items={users}
+          groupOf={(user) => user.role}
+          labelOf={userDisplayName}
+          keyOf={(user) => user.badgeNumber}
+          onSelect={selectUser}
+          onClose={() => setBadgeOpen(false)}
+        />
       )}
       {deviceOpen && (
-        <div className="modal-overlay" onClick={() => setDeviceOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <span className="modal-label">Select a device</span>
-            <div className="accordion">
-              {deviceTypes.map((typeName) => (
-                <div className="accordion-section" key={typeName}>
-                  <button
-                    type="button"
-                    className="accordion-header"
-                    onClick={() =>
-                      setOpenDeviceType((current) =>
-                        current === typeName ? null : typeName,
-                      )
-                    }
-                  >
-                    {openDeviceType === typeName ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    )}
-                    {typeName}
-                  </button>
-                  {openDeviceType === typeName && (
-                    <ul className="user-list">
-                      {devicesByType[typeName]
-                        .slice()
-                        .sort((a, b) =>
-                          a.deviceNumber.localeCompare(b.deviceNumber),
-                        )
-                        .map((device) => (
-                          <li
-                            key={device.deviceNumber}
-                            className="user-list-item"
-                            onClick={() => selectDevice(device)}
-                          >
-                            {device.deviceNumber}
-                          </li>
-                        ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="modal-actions">
-              <button type="button" onClick={() => setDeviceOpen(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <AccordionPicker
+          title="Select a device"
+          items={devices}
+          groupOf={(device) =>
+            device.deviceType?.deviceTypeName ?? UNKNOWN_DEVICE_TYPE
+          }
+          labelOf={(device) => device.deviceNumber}
+          keyOf={(device) => device.deviceNumber}
+          onSelect={selectDevice}
+          onClose={() => setDeviceOpen(false)}
+        />
       )}
     </div>
   )
