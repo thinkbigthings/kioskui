@@ -20,7 +20,18 @@
   top: 0;
   width: 20%;
   height: 100%;
-  background: lightblue;
+  /* #3: data-driven hue comes from inline background-color; this radial
+     highlight layers on top — bright in the center, darkening at the edges,
+     so the LED reads as a lit, domed lens. */
+  background-image: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0) 55%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  /* #2: colored glow spilling outward; currentColor matches the LED hue
+     (set inline alongside background-color). */
+  box-shadow: 0 0 10px 2px currentColor;
 }
 
 .port-icon {
@@ -34,6 +45,16 @@
 
 .port-icon.plug {
   transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.device-present {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* perspective + rotateX foreshortens the top edge, so the rectangle
+     reads as a trapezoid (wider at the bottom). */
+  transform: translate(-50%, -50%) perspective(80px) rotateX(45deg);
+  color: #333;
 }
 
 .door {

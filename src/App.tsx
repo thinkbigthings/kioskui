@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BatteryCharging, Plug } from 'lucide-react'
+import { BatteryCharging, Plug, RectangleHorizontal } from 'lucide-react'
 import './App.css'
 import type { LockerNumbered } from './types'
 
@@ -53,7 +53,8 @@ function App() {
             <div
               className="led"
               style={{
-                background: `rgb(${led.red}, ${led.green}, ${led.blue})`,
+                backgroundColor: `rgb(${led.red}, ${led.green}, ${led.blue})`,
+                color: `rgb(${led.red}, ${led.green}, ${led.blue})`,
               }}
             />
             {door === 'OPEN' &&
@@ -75,7 +76,12 @@ function App() {
               onClick={
                 door === 'OPEN' ? () => closeDoor(lockerNumber) : undefined
               }
-            />
+            >
+              {chargingPortStatus !== 'PORT_STATUS_DETACHED' &&
+                door !== 'OPEN' && (
+                  <RectangleHorizontal className="device-present" size={56} />
+                )}
+            </div>
           </div>
         ))}
     </div>
