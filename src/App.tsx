@@ -11,7 +11,9 @@ import {
   UserRound,
 } from 'lucide-react'
 import './App.css'
-import type { LockerNumbered, ScannerState, User } from './types'
+import type { Device, LockerNumbered, ScannerState, User } from './types'
+
+const UNKNOWN_DEVICE_TYPE = 'Unknown'
 
 interface KioskState {
   scannerState: ScannerState
@@ -29,6 +31,9 @@ function App() {
   const [users, setUsers] = useState<User[]>([])
   const [badgeOpen, setBadgeOpen] = useState(false)
   const [openRole, setOpenRole] = useState<string | null>(null)
+  const [devices, setDevices] = useState<Device[]>([])
+  const [deviceOpen, setDeviceOpen] = useState(false)
+  const [openDeviceType, setOpenDeviceType] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchState = () => {
@@ -51,6 +56,13 @@ function App() {
       .then((res) => res.json())
       .then((data: User[]) => setUsers(data))
       .catch((err) => console.error('Failed to load users', err))
+  }, [])
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/sim/kiosk/cache/devices')
+      .then((res) => res.json())
+      .then((data: Device[]) => setDevices(data))
+      .catch((err) => console.error('Failed to load devices', err))
   }, [])
 
   const closeDoor = (lockerNumber: number) => {
@@ -101,11 +113,26 @@ function App() {
     return fullName || user.userName
   }
 
+  const selectDevice = (device: Device) => {
+    enqueueScan(device.deviceNumber)
+    setDeviceOpen(false)
+  }
+
   const usersByRole = users.reduce<Record<string, User[]>>((acc, user) => {
     ;(acc[user.role] ??= []).push(user)
     return acc
   }, {})
   const roles = Object.keys(usersByRole).sort()
+
+  const devicesByType = devices.reduce<Record<string, Device[]>>(
+    (acc, device) => {
+      const typeName = device.deviceType?.deviceTypeName ?? UNKNOWN_DEVICE_TYPE
+      ;(acc[typeName] ??= []).push(device)
+      return acc
+    },
+    {},
+  )
+  const deviceTypes = Object.keys(devicesByType).sort()
 
   return (
     <div className="kiosk">
@@ -146,6 +173,7 @@ function App() {
             className="scanner-button"
             aria-label="device"
             disabled={!scannerActive}
+            onClick={() => setDeviceOpen(true)}
           >
             <Smartphone />
           </button>
@@ -261,6 +289,58 @@ function App() {
             </div>
             <div className="modal-actions">
               <button type="button" onClick={() => setBadgeOpen(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deviceOpen && (
+        <div className="modal-overlay" onClick={() => setDeviceOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <span className="modal-label">Select a device</span>
+            <div className="accordion">
+              {deviceTypes.map((typeName) => (
+                <div className="accordion-section" key={typeName}>
+                  <button
+                    type="button"
+                    className="accordion-header"
+                    onClick={() =>
+                      setOpenDeviceType((current) =>
+                        current === typeName ? null : typeName,
+                      )
+                    }
+                  >
+                    {openDeviceType === typeName ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                    {typeName}
+                  </button>
+                  {openDeviceType === typeName && (
+                    <ul className="user-list">
+                      {devicesByType[typeName]
+                        .slice()
+                        .sort((a, b) =>
+                          a.deviceNumber.localeCompare(b.deviceNumber),
+                        )
+                        .map((device) => (
+                          <li
+                            key={device.deviceNumber}
+                            className="user-list-item"
+                            onClick={() => selectDevice(device)}
+                          >
+                            {device.deviceNumber}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button type="button" onClick={() => setDeviceOpen(false)}>
                 Cancel
               </button>
             </div>

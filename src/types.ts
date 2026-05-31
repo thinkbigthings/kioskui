@@ -30,6 +30,16 @@ export interface User {
   role: string
 }
 
+export interface DeviceType {
+  deviceTypeId: number
+  deviceTypeName: string
+}
+
+export interface Device {
+  deviceNumber: string
+  deviceType: DeviceType | null
+}
+
 export interface LockerNumbered {
   lockerNumber: number
   locker: Locker
