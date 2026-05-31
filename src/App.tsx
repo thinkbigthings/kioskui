@@ -3,7 +3,6 @@ import {
   BatteryCharging,
   History,
   Plug,
-  RectangleHorizontal,
   Smartphone,
   SquarePen,
   UserRound,
@@ -231,7 +230,7 @@ function App() {
             >
               {chargingPortStatus !== 'PORT_STATUS_DETACHED' &&
                 door !== 'OPEN' && (
-                  <RectangleHorizontal className="device-present" size={56} />
+                  <Smartphone className="device-present" size={40} />
                 )}
             </div>
           </div>
