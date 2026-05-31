@@ -243,6 +243,29 @@
   color: var(--accent);
 }
 
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recent-category {
+  flex-shrink: 0;
+  min-width: 84px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--social-bg);
+  color: var(--text);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.recent-empty {
+  padding: 8px 4px;
+  color: var(--text);
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;

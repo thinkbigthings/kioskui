@@ -13,6 +13,18 @@ import AccordionPicker from './AccordionPicker'
 import type { Device, LockerNumbered, ScannerState, User } from './types'
 
 const UNKNOWN_DEVICE_TYPE = 'Unknown'
+const MAX_RECENT = 5
+
+interface RecentItem {
+  /** unique id used to de-duplicate within the recent list */
+  key: string
+  /** leftmost text: the user's role or the device type name */
+  category: string
+  /** the text shown for the item */
+  label: string
+  /** the value enqueued to the scanner when selected */
+  data: string
+}
 
 interface KioskState {
   scannerState: ScannerState
@@ -31,6 +43,8 @@ function App() {
   const [badgeOpen, setBadgeOpen] = useState(false)
   const [devices, setDevices] = useState<Device[]>([])
   const [deviceOpen, setDeviceOpen] = useState(false)
+  const [recent, setRecent] = useState<RecentItem[]>([])
+  const [recentOpen, setRecentOpen] = useState(false)
 
   useEffect(() => {
     const fetchState = () => {
@@ -100,9 +114,10 @@ function App() {
     setManualOpen(false)
   }
 
-  const selectUser = (user: User) => {
-    enqueueScan(user.badgeNumber)
-    setBadgeOpen(false)
+  const addRecent = (item: RecentItem) => {
+    setRecent((prev) =>
+      [item, ...prev.filter((r) => r.key !== item.key)].slice(0, MAX_RECENT),
+    )
   }
 
   const userDisplayName = (user: User) => {
@@ -110,9 +125,31 @@ function App() {
     return fullName || user.userName
   }
 
+  const selectUser = (user: User) => {
+    enqueueScan(user.badgeNumber)
+    addRecent({
+      key: `user:${user.badgeNumber}`,
+      category: user.role,
+      label: userDisplayName(user),
+      data: user.badgeNumber,
+    })
+    setBadgeOpen(false)
+  }
+
   const selectDevice = (device: Device) => {
     enqueueScan(device.deviceNumber)
+    addRecent({
+      key: `device:${device.deviceNumber}`,
+      category: device.deviceType?.deviceTypeName ?? UNKNOWN_DEVICE_TYPE,
+      label: device.deviceNumber,
+      data: device.deviceNumber,
+    })
     setDeviceOpen(false)
+  }
+
+  const selectRecent = (item: RecentItem) => {
+    enqueueScan(item.data)
+    setRecentOpen(false)
   }
 
   return (
@@ -128,6 +165,7 @@ function App() {
             className="scanner-button"
             aria-label="recent"
             disabled={!scannerActive}
+            onClick={() => setRecentOpen(true)}
           >
             <History />
           </button>
@@ -219,6 +257,34 @@ function App() {
               </button>
               <button type="button" onClick={submitManual}>
                 OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {recentOpen && (
+        <div className="modal-overlay" onClick={() => setRecentOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <span className="modal-label">Recently scanned</span>
+            {recent.length === 0 ? (
+              <p className="recent-empty">Nothing scanned yet.</p>
+            ) : (
+              <ul className="user-list">
+                {recent.map((item) => (
+                  <li
+                    key={item.key}
+                    className="user-list-item recent-item"
+                    onClick={() => selectRecent(item)}
+                  >
+                    <span className="recent-category">{item.category}</span>
+                    {item.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="modal-actions">
+              <button type="button" onClick={() => setRecentOpen(false)}>
+                Cancel
               </button>
             </div>
           </div>
