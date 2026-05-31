@@ -3,6 +3,7 @@ export type DoorState = 'OPEN' | 'CLOSED'
 export type ChargingPortStatus =
   | 'PORT_STATUS_DETACHED'
   | 'PORT_STATUS_ATTACHED'
+  | 'PORT_STATUS_CHARGING'
 
 export interface Led {
   red: number

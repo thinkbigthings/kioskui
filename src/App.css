@@ -23,6 +23,19 @@
   background: lightblue;
 }
 
+.port-icon {
+  position: absolute;
+  left: 40%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #444;
+  cursor: pointer;
+}
+
+.port-icon.plug {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
 .door {
   position: absolute;
   left: 20%;

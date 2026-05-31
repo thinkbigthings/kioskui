@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BatteryCharging, Plug } from 'lucide-react'
 import './App.css'
 import type { LockerNumbered } from './types'
 
@@ -31,11 +32,23 @@ function App() {
     }).catch((err) => console.error('Failed to close door', err))
   }
 
+  const attachPort = (lockerNumber: number) => {
+    fetch(`http://localhost:8080/api/sim/locker/${lockerNumber}/port/attach`, {
+      method: 'POST',
+    }).catch((err) => console.error('Failed to plug in', err))
+  }
+
+  const detachPort = (lockerNumber: number) => {
+    fetch(`http://localhost:8080/api/sim/locker/${lockerNumber}/port/detach`, {
+      method: 'POST',
+    }).catch((err) => console.error('Failed to unplug', err))
+  }
+
   return (
     <div className="kiosk">
       {lockers
         .filter(({ lockerNumber }) => lockerNumber <= LOCKERS_TO_SHOW)
-        .map(({ lockerNumber, locker: { led, door } }) => (
+        .map(({ lockerNumber, locker: { led, door, chargingPortStatus } }) => (
           <div className="locker" key={lockerNumber}>
             <div
               className="led"
@@ -43,6 +56,20 @@ function App() {
                 background: `rgb(${led.red}, ${led.green}, ${led.blue})`,
               }}
             />
+            {door === 'OPEN' &&
+              (chargingPortStatus === 'PORT_STATUS_DETACHED' ? (
+                <Plug
+                  className="port-icon plug"
+                  size={64}
+                  onClick={() => attachPort(lockerNumber)}
+                />
+              ) : (
+                <BatteryCharging
+                  className="port-icon"
+                  size={64}
+                  onClick={() => detachPort(lockerNumber)}
+                />
+              ))}
             <div
               className={`door ${door === 'OPEN' ? 'open' : ''}`}
               onClick={
