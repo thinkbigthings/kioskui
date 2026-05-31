@@ -18,6 +18,10 @@ export interface Locker {
   chargingPortStatus: ChargingPortStatus
 }
 
+export interface ScannerState {
+  active: boolean
+}
+
 export interface LockerNumbered {
   lockerNumber: number
   locker: Locker

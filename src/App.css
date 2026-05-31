@@ -6,6 +6,82 @@
   flex-grow: 1;
 }
 
+.scanner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 220px;
+  height: 120px; /* 1.5x a locker */
+  background: #888;
+  border: 1px solid #666;
+}
+
+.scanner-top {
+  height: 50%; /* leave the bottom half for interaction buttons */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.scanner-label {
+  color: #222;
+  font-weight: 600;
+}
+
+.scanner-window {
+  width: 50px;
+  height: 18px;
+  border-radius: 4px;
+  background-color: #333;
+}
+
+.scanner-bottom {
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.scanner-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #d0d0d0;
+  color: #222;
+  cursor: pointer;
+}
+
+.scanner-button:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.scanner-button:disabled {
+  background: #9a9a9a;
+  color: #777;
+  border-color: #777;
+  cursor: not-allowed;
+}
+
+.scanner-window.active {
+  /* lit white, mirroring the LED treatment */
+  background-color: #fff;
+  color: #fff;
+  background-image: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0) 55%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  box-shadow: 0 0 10px 2px currentColor;
+}
+
 .locker {
   position: relative;
   width: 220px;
